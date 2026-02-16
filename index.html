@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almendra+Display&family=Cormorant+Upright:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Global Grain Overlay -->
+    <div id="grain-overlay"></div>
+
+    <div id="container">
+        <!-- Page 1: Entry -->
+        <section id="entry-page" class="page active">
+            <canvas id="sand-canvas"></canvas>
+
+
+            <div class="content-wrapper">
+                <h1 class="title">The Book<br>of Sand</h1>
+                <p class="subtitle"><br>Give me a design source url to enter</p>
+                <form id="login-form">
+                    <div class="input-container">
+                        <input type="url" id="url-code" placeholder="https://example.com" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="enter-btn">
+                        <span class="btn-text">Initialize</span>
+                    </button>
+                    <p id="error-message" class="error hidden">Invalid URL protocol detected.</p>
+                </form>
+            </div>
+        </section>
+
+        <!-- Page 2: Cubes -->
+        <section id="cube-page" class="page hidden">
+            <div class="cubes-container">
+                <!-- Cube 1 -->
+                <div class="cube-wrapper">
+                    <div class="scene" id="text-scene">
+                        <div class="cube" id="text-cube">
+                            <div class="cube-face front">
+                                <div class="face-content story-mode">
+                                    <p>The line is made up of an infinite number of points; the plane of an infinite
+                                        number of lines.</p>
+                                </div>
+                            </div>
+                            <div class="cube-face back">
+                                <div class="face-content story-mode">
+                                    <p> During the course of our conversation,
+                                        which was not to last an hour, I found out that he came from the Orkneys. I
+                                        invited him in, pointing to a chair. </p>
+                                </div>
+                            </div>
+                            <div class="cube-face right">
+                                <div class="face-content story-mode">
+                                    <p> He said, "I don't only sell Bibles. I
+                                        can show you a holy book I came across on the outskirts of Bikaner. </p>
+                                </div>
+                            </div>
+                            <div class="cube-face left">
+                                <div class="face-content story-mode">
+                                    <p> On the
+                                        spine were the words "Holy Writ" and, below them, "Bombay." "Nineteenth century,
+                                        probably," I remarked. </p>
+                                </div>
+                            </div>
+                            <div class="cube-face top">
+                                <div class="face-content story-mode">
+                                    <p>The pages were worn and typographically poor, double columns, as in a Bible. In
+                                        the upper corners were Arabic numbers.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="cube-face bottom">
+                                <div class="face-content story-mode">
+                                    <p>" I lost the Book of Sand on one of the basement's musty shelves.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="controls-hint">
+                <button id="format-btn" class="control-btn">Change</button>
+            </div>
+
+            <div class="video-container">
+                <video class="input_video"></video>
+                <canvas class="output_canvas"></canvas>
+            </div>
+        </section>
+    </div>
+    <script src="main.js"></script>
+</body>
+
+</html>
