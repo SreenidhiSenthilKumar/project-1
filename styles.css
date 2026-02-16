@@ -90,35 +90,9 @@ body {
 /*ENTRY PAGE*/
 #entry-page {
     padding: 100px;
-
-    /* Floral Border Configuration */
-    background-image:
-        url('assets/flower1.jpg'),
-        /* Top */
-        url('assets/flower1.jpg'),
-        /* Bottom */
-        url('assets/flower1.jpg'),
-        /* Left */
-        url('assets/flower1.jpg');
-    /* Right */
-
-    background-position:
-        top left,
-        bottom left,
-        top left,
-        top right;
-
-    background-repeat:
-        repeat-x,
-        repeat-x,
-        repeat-y,
-        repeat-y;
-
-    background-size:
-        auto 100px,
-        auto 100px,
-        100px auto,
-        100px auto;
+    position: relative;
+    overflow: hidden;
+    
 }
 
 .content-wrapper {
@@ -126,7 +100,8 @@ body {
     max-width: 600px;
     width: 100%;
     position: relative;
-    z-index: 2;
+    z-index: 10;
+   
 }
 
 .title {
@@ -145,11 +120,67 @@ body {
     margin-bottom: 3.5rem;
     font-family: var(--font-heading);
     font-weight: 400;
-    font-size: 1rem;
+    font-size: 1.2rem;
     letter-spacing: 0.12em;
-    text-transform: uppercase;
+
     opacity: 0.7;
 }
+
+/* Collage Images */
+.collage-image {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.90;
+    mix-blend-mode: multiply;
+}
+
+
+.img-1 {
+    top: 10%;
+    left: 5%;
+    width: 280px;
+}
+
+.img-6 {
+    top: 50%;
+    right: 5%;
+    width: 200px;
+
+}
+
+.img-2 {
+    top: 20%;
+    right: 12%;
+    width: 250px;
+    z-index: -1;
+}
+
+.img-3 {
+    bottom: 15%;
+    left: 10%;
+    width: 220px;
+}
+
+
+.img-5 {
+    top: 40%;
+    left: 2%;
+    width: 190px;
+}
+
+
+
+
+
+
+@media (max-width: 768px) {
+    .collage-image {
+        display: none;
+    }
+}
+
+
 
 /* Form Elements */
 .input-container {
@@ -200,6 +231,8 @@ input[type="url"]::placeholder {
     text-transform: uppercase;
     transition: all 0.4s ease-out;
     border-radius: 0;
+    margin-top: 2rem;
+    
 }
 
 .enter-btn:hover {
@@ -358,7 +391,7 @@ input[type="url"]::placeholder {
 
 .cubes-container.flow-mode .cube-wrapper {
     display: none;
-    /* Hide default cube in flow mode */
+    
 }
 
 /* Flow Items */
@@ -382,7 +415,6 @@ input[type="url"]::placeholder {
     transition:
         opacity 0.5s ease,
         transform 0.1s linear,
-        /* smooth movement */
         width 0.5s ease,
         height 0.5s ease,
         background-color 0.5s ease;
@@ -435,7 +467,7 @@ input[type="url"]::placeholder {
     right: 20px;
     width: 200px;
     height: 150px;
-    /* border-radius: 0; Default is 0 anyway */
+
     overflow: hidden;
     z-index: 100;
     box-shadow: 0 4px 15px rgba(31, 31, 31, 0.2);
@@ -510,7 +542,6 @@ input[type="url"]::placeholder {
 
     .title {
         font-size: 4rem;
-        /* Adjusted for better proportion */
         line-height: 0.9;
     }
 
@@ -629,6 +660,6 @@ input[type="url"]::placeholder {
 
     .face-content.story-mode p {
         font-size: 0.9rem;
-        /* Reduced from 1.1rem/1.5rem */
+       
     }
 }
