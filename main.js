@@ -2,12 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /*CONFIGURATION & DATA */
     const CONFIG = {
-        sandColors: ['#F2EFE9', '#E6CFCF', '#DDD8D0', '#C9C1B6', '#B8AFA3'],
-        bgColors: [
-            '#5C1212', '#737A66', '#1F1F1F', '#3D2B1F', '#4A3728',
-            '#2C1A0E', '#8B4513', '#6B3A2E', '#4E3524', '#2D1B0E',
-            '#5A4234', '#3B2F2F', '#654321', '#704214', '#39422cff'
-        ],
+        bgColors: ['#000000'],
         storyTexts: [
             "The book is Infinite. None of its pages is the first; none the last.",
             "If space is infinite, we are at any point in space. If time is infinite, we are at any point in time.",
@@ -37,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /*DOM ELEMENTS */
     const elements = {
-        sandCanvas: document.getElementById('sand-canvas'),
         entryPage: document.getElementById('entry-page'),
         cubePage: document.getElementById('cube-page'),
         loginForm: document.getElementById('login-form'),
@@ -84,85 +78,193 @@ document.addEventListener('DOMContentLoaded', () => {
         camera: null
     };
 
-    /*SAND ANIMATION */
-    function initSandAnimation() {
-        if (!elements.sandCanvas) return;
+    /*TITLE PARTICLE EFFECT */
+    function initTitleParticleEffect() {
+        const title = document.querySelector('.title');
+        if (!title) return;
 
-        const ctx = elements.sandCanvas.getContext('2d');
-        let width, height;
         let particles = [];
-        let animationId;
-        let isWashing = false;
+        let overlayCanvas = null;
+        let ctx = null;
+        let mouseX = -9999, mouseY = -9999;
+        let rafId = null;
 
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            elements.sandCanvas.width = width;
-            elements.sandCanvas.height = height;
-            initParticles();
-        }
+        const REPEL_RADIUS = 160;
+        const REPEL_FORCE = 22;
+        const SPRING = 0.022;
+        const FRICTION = 0.91;
+        const SAMPLE_STEP = 2;
+        const PARTICLE_COLOR = '#FFFFFF';
 
-        function initParticles() {
+        function setup() {
+            const rect = title.getBoundingClientRect();
+            if (rect.width === 0) return;
+
+            const fontSize = parseFloat(getComputedStyle(title).fontSize);
+            const PAD = 12;
+
+            const ofc = document.createElement('canvas');
+            ofc.width = Math.ceil(rect.width) + PAD * 2;
+            ofc.height = Math.ceil(rect.height) + PAD * 2;
+            const oc = ofc.getContext('2d');
+
+            oc.fillStyle = '#fff';
+            oc.font = `900 ${fontSize}px Respira, serif`;
+            oc.textAlign = 'left';
+            oc.textBaseline = 'alphabetic';
+
+            const m = oc.measureText('The Book');
+            const ascent = m.actualBoundingBoxAscent;
+            const line1Y = PAD + ascent;
+            const line2Y = line1Y + fontSize * 1.0524;
+
+            const spaceW = oc.measureText(' ').width;
+            const theW   = oc.measureText('The').width;
+            const ofW    = oc.measureText('of').width;
+
+            oc.fillText('The', PAD, line1Y);
+            oc.fillText('Book', PAD + theW + spaceW - fontSize * 0.11, line1Y);
+            oc.fillText('of', PAD, line2Y);
+            oc.fillText('Sand', PAD + ofW + spaceW - fontSize * 0.05, line2Y);
+
+            const imgData = oc.getImageData(0, 0, ofc.width, ofc.height);
+            const d = imgData.data;
             particles = [];
-            let particleCount = (width * height) / 1000;
-            if (particleCount > 12000) particleCount = 12000;
 
-            for (let i = 0; i < particleCount; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    size: Math.random() * 2 + 1,
-                    speedY: 0,
-                    speedX: 0,
-                    color: CONFIG.sandColors[Math.floor(Math.random() * CONFIG.sandColors.length)],
-                    accelY: (Math.random() * 0.2) + 0.1,
-                    accelX: (Math.random() - 0.5) * 0.1
-                });
+            for (let py = 0; py < ofc.height; py += SAMPLE_STEP) {
+                for (let px = 0; px < ofc.width; px += SAMPLE_STEP) {
+                    if (d[(py * ofc.width + px) * 4 + 3] > 100) {
+                        const hx = rect.left + px - PAD;
+                        const hy = rect.top + py - PAD;
+                        particles.push({ homeX: hx, homeY: hy, x: hx, y: hy, vx: 0, vy: 0 });
+                    }
+                }
             }
-            draw();
-        }
 
-        function draw() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-            });
-        }
-
-        function update() {
-            if (!isWashing) return;
-            ctx.clearRect(0, 0, width, height);
-            let activeParticles = 0;
-
-            particles.forEach(p => {
-                p.speedY += p.accelY;
-                p.speedX += p.accelX;
-                p.y += p.speedY;
-                p.x += p.speedX;
-
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-
-                if (p.y < height) activeParticles++;
-            });
-
-            if (activeParticles > 0) {
-                animationId = requestAnimationFrame(update);
-            } else {
-                elements.sandCanvas.style.display = 'none';
-                cancelAnimationFrame(animationId);
+            if (!overlayCanvas) {
+                overlayCanvas = document.createElement('canvas');
+                overlayCanvas.id = 'title-particle-canvas';
+                overlayCanvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:11;transition:opacity 0.6s ease;';
+                document.body.appendChild(overlayCanvas);
             }
+            overlayCanvas.width = window.innerWidth;
+            overlayCanvas.height = window.innerHeight;
+            ctx = overlayCanvas.getContext('2d');
+
+            title.classList.add('particles-active');
+            if (!rafId) rafId = requestAnimationFrame(animate);
         }
 
-        window.addEventListener('resize', resize);
-        resize();
+        function animate() {
+            ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            ctx.fillStyle = PARTICLE_COLOR;
 
-        // Auto-start wash away effect
-        setTimeout(() => {
-            isWashing = true;
-            update();
-        }, 1000);
+            for (const p of particles) {
+                const dx = mouseX - p.x;
+                const dy = mouseY - p.y;
+                const distSq = dx * dx + dy * dy;
+
+                if (distSq < REPEL_RADIUS * REPEL_RADIUS && distSq > 0.01) {
+                    const dist = Math.sqrt(distSq);
+                    const f = (1 - dist / REPEL_RADIUS) * REPEL_FORCE;
+                    p.vx -= (dx / dist) * f + (Math.random() - 0.5) * f * 0.6;
+                    p.vy -= (dy / dist) * f + (Math.random() - 0.5) * f * 0.6;
+                }
+
+                p.vx += (p.homeX - p.x) * SPRING;
+                p.vy += (p.homeY - p.y) * SPRING;
+                p.vx *= FRICTION;
+                p.vy *= FRICTION;
+                p.x += p.vx;
+                p.y += p.vy;
+
+                ctx.fillRect(Math.round(p.x), Math.round(p.y), 2, 2);
+            }
+
+            rafId = requestAnimationFrame(animate);
+        }
+
+        return function start() {
+            document.fonts.ready.then(setup);
+            document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    title.classList.remove('particles-active');
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
+                    setup();
+                }, 150);
+            });
+        };
+    }
+
+    /*INTRO ANIMATION*/
+    function initIntroAnimation(onComplete) {
+        const screen = document.getElementById('intro-screen');
+        if (!screen) { onComplete(); return; }
+
+        const canvas = document.getElementById('intro-bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const SIZE = Math.min(canvas.width, canvas.height) * 0.18;
+        const letters = ['A', 'C', 'G', 'M', 'R'];
+
+        const balls = letters.map(ch => ({
+            ch,
+            x: SIZE + Math.random() * (canvas.width - SIZE * 2),
+            y: SIZE + Math.random() * (canvas.height - SIZE * 2),
+            vx: (Math.random() < 0.5 ? -1 : 1) * (3 + Math.random() * 3),
+            vy: (Math.random() < 0.5 ? -1 : 1) * (3 + Math.random() * 3),
+        }));
+
+        let rafId;
+        let alpha = 0;
+        let fading = false;
+        let fadeTs = 0;
+
+        function draw(ts) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!fading) alpha = Math.min(1, alpha + 0.03);
+            else alpha = Math.max(0, 1 - (ts - fadeTs) / 800);
+
+            ctx.font = `900 ${SIZE}px 'Yarndings 12', serif`;
+            ctx.fillStyle = '#fff';
+            ctx.globalAlpha = alpha;
+
+            for (const b of balls) {
+                b.x += b.vx;
+                b.y += b.vy;
+                if (b.x < 0)                    { b.x = 0;                    b.vx *= -1; }
+                if (b.x > canvas.width - SIZE)  { b.x = canvas.width - SIZE;  b.vx *= -1; }
+                if (b.y < SIZE)                 { b.y = SIZE;                 b.vy *= -1; }
+                if (b.y > canvas.height)        { b.y = canvas.height;        b.vy *= -1; }
+                ctx.fillText(b.ch, b.x, b.y);
+            }
+
+            ctx.globalAlpha = 1;
+            if (!fading || alpha > 0) rafId = requestAnimationFrame(draw);
+        }
+        rafId = requestAnimationFrame(draw);
+
+        let done = false;
+        function finish() {
+            if (done) return;
+            done = true;
+            screen.style.background = 'transparent';
+            onComplete();
+            setTimeout(() => {
+                screen.style.opacity = '0';
+                setTimeout(() => { screen.style.display = 'none'; cancelAnimationFrame(rafId); }, 800);
+            }, 1500);
+        }
+
+        screen.style.pointerEvents = 'auto';
+        screen.addEventListener('click', finish);
+        setTimeout(finish, 9200);
     }
 
     /*NAVIGATION */
@@ -194,11 +296,15 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.entryPage.classList.remove('active');
         elements.entryPage.classList.add('hidden');
 
+        const particleCanvas = document.getElementById('title-particle-canvas');
+        if (particleCanvas) particleCanvas.style.opacity = '0';
+
         setTimeout(() => {
             elements.entryPage.style.display = 'none';
+            if (particleCanvas) particleCanvas.style.display = 'none';
             elements.cubePage.classList.remove('hidden');
             elements.cubePage.classList.add('active');
-        }, 500);
+        }, 600);
     }
 
     /*CUBE INTERACTION */
@@ -234,12 +340,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleFaceChange(face) {
-        // Change global colors
         for (let i = 1; i <= 6; i++) {
             document.documentElement.style.setProperty(`--color-${i}`, getRandomItem(CONFIG.bgColors));
         }
 
-        // Change text content
         const textFaceEl = state.cubes.text.element.querySelector(`.cube-face.${face}`);
         if (textFaceEl) {
             const p = textFaceEl.querySelector('p');
@@ -308,7 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
             cube.startY = y;
         };
 
-        // Mouse Events
         scene.addEventListener('mousedown', (e) => {
             onStart(e.clientX, e.clientY);
             e.stopPropagation();
@@ -316,7 +419,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', onEnd);
         document.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
 
-        // Touch Events
         scene.addEventListener('touchstart', (e) => {
             onStart(e.touches[0].clientX, e.touches[0].clientY);
             e.stopPropagation();
@@ -332,7 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function initCubeInteraction() {
         setupDrag(elements.textScene, 'text');
 
-        // Click on face to snap/rotate (optional feature from original code)
         document.querySelectorAll('.cube-face').forEach(face => {
             face.addEventListener('click', () => {
                 const faceType = Array.from(face.classList).find(c => CONFIG.faceRotations[c]);
@@ -501,7 +602,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 initFlowMode();
             }
 
-            elements.formatBtn.textContent = `MODE: ${newMode.toUpperCase()}`;
         });
     }
 
@@ -521,14 +621,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         hands.onResults(onResultsDelegator);
 
-        // Start Camera when Cube Page is active
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.target.id === 'cube-page' &&
                     mutation.target.classList.contains('active') &&
                     !state.camera) {
 
-                    console.log("Starting Camera...");
                     state.camera = new Camera(elements.videoElement, {
                         onFrame: async () => {
                             await hands.send({ image: elements.videoElement });
@@ -542,7 +640,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         observer.observe(elements.cubePage, { attributes: true, attributeFilter: ['class'] });
 
-        // Helper: Check for open hand
         function isHandOpen(landmarks) {
             const wrist = landmarks[0];
             const tips = [8, 12, 16, 20];
@@ -557,7 +654,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return extendedCount >= 3;
         }
 
-        // Main Result Delegator
         function onResultsDelegator(results) {
             const currentMode = state.mode.current;
 
@@ -566,7 +662,6 @@ document.addEventListener('DOMContentLoaded', () => {
             canvasCtx.drawImage(results.image, 0, 0, elements.canvasElement.width, elements.canvasElement.height);
 
             if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
-                // No hands detected
                 if (currentMode === 'flow' && !state.flow.manualFocus) {
                     floatAllElements();
                 }
@@ -575,12 +670,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Draw Hand Landmarks
             for (const landmarks of results.multiHandLandmarks) {
-                const colorL = currentMode === 'flow' ? '#ab3fc6' : '#f7428a';
-                const colorC = currentMode === 'flow' ? '#00c3ff' : '#ffffff';
-                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: colorC, lineWidth: 5 });
-                drawLandmarks(canvasCtx, landmarks, { color: colorL, lineWidth: 2 });
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#000000', lineWidth: 1 });
+                drawLandmarks(canvasCtx, landmarks, { color: '#000000', lineWidth: 1, radius: 2 });
             }
 
             if (currentMode === 'flow') {
@@ -593,7 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function handleFlowGesture(landmarks, isHandOpenFn) {
-            if (state.flow.manualFocus) return; // Manual override
+            if (state.flow.manualFocus) return;
 
             if (isHandOpenFn(landmarks)) {
                 focusClosestElement();
@@ -605,7 +697,6 @@ document.addEventListener('DOMContentLoaded', () => {
         function handleCubeGesture(allLandmarks) {
             const PINCH_THRESHOLD = 0.05;
 
-            // Hand 0: Rotation (Index 0)
             const hand0 = allLandmarks[0];
             const thumb0 = hand0[4];
             const index0 = hand0[8];
@@ -648,7 +739,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Hand 1: Snap (Index 1)
             if (allLandmarks.length > 1) {
                 const hand1 = allLandmarks[1];
                 const thumb1 = hand1[4];
@@ -663,7 +753,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /*GLOBAL LISTENERS */
-    // Click to focus in Flow Mode
     window.addEventListener('click', (e) => {
         if (state.mode.current === 'flow' && e.target !== elements.formatBtn) {
             state.flow.manualFocus = !state.flow.manualFocus;
@@ -675,8 +764,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    /*FAVICON*/
+    document.fonts.ready.then(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 32, 32);
+        ctx.fillStyle = '#fff';
+        ctx.font = '900 26px "Yarndings 12", serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('R', 16, 16);
+        const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+        link.rel = 'icon';
+        link.href = canvas.toDataURL();
+        document.head.appendChild(link);
+    });
+
+    /*MODE TOGGLE*/
+    document.getElementById('mode-toggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('light-mode');
+    });
+
     /*INIT */
-    initSandAnimation();
+    const startParticles = initTitleParticleEffect();
+    initIntroAnimation(() => startParticles());
     initNavigation();
     initCubeInteraction();
     setupModeSwitch();

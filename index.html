@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Almendra+Display&family=Cormorant+Upright:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Yarndings+12&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
@@ -26,30 +26,27 @@
     <div id="container">
         <!-- Page 1: Entry -->
         <section id="entry-page" class="page active">
-            <canvas id="sand-canvas"></canvas>
+            <div class="macbook-pro-16-8">
+                <h1 class="the-book-of-container title">The<span class="span"> </span>Book<br>of<span class="span2"> </span>Sand</h1>
 
-            <!-- Collage Images -->
-            <img src="assets/flower1.jpg" class="collage-image img-1" alt="Flower 1">
-            <img src="assets/flower2.jpg" class="collage-image img-2" alt="Flower 2">
-            <img src="assets/flower3.jpg" class="collage-image img-3" alt="Flower 3">
-   
-            <img src="assets/flower5.jpg" class="collage-image img-5" alt="Flower 5">
-            <img src="assets/flower8.jpg" class="collage-image img-6" alt="Flower 6">
-          
+                <p class="imagine-a-book-container">Imagine a book that is a physical labyrinth,<span class="span3"> </span>a volume with no first or last page, where every time you turn a leaf, others sprout infinitely in between.</p>
 
-
-            <div class="content-wrapper">
-                <h1 class="title">The Book<br>of Sand</h1>
-                <p class="subtitle"><br>Give me a design source url to enter</p>
-                <form id="login-form">
-                    <div class="input-container">
-                        <input type="url" id="url-code" placeholder="https://example.com" required autocomplete="off">
+                <div class="rectangle-parent">
+                    <span class="yarn-inline form-glyph">R</span>
+                    <div class="form-content">
+                        <p class="give-me-a">Give me a design source url to enter</p>
+                        <form id="login-form">
+                            <div class="form-input-row">
+                                <input type="url" id="url-code" class="group-child" placeholder="" required autocomplete="off">
+                            </div>
+                            <p id="error-message" class="error">Invalid URL.</p>
+                        </form>
                     </div>
-                    <button type="submit" class="enter-btn">
-                        <span class="btn-text">Initialize</span>
-                    </button>
-                    <p id="error-message" class="error hidden">Invalid URL protocol detected.</p>
-                </form>
+                </div>
+
+                <div class="el-libro-de"><span class="yarn-inline">R</span> El libro de arena <span class="yarn-inline">R</span></div>
+                <div class="jorge-luis-borges"><span class="yarn-inline">R</span> Jorge Luis Borges <span class="yarn-inline">R</span></div>
+                <div class="div"><span class="yarn-inline">R</span> 1975 <span class="yarn-inline">R</span></div>
             </div>
         </section>
 
@@ -105,8 +102,10 @@
 
             </div>
 
+            <button id="mode-toggle" class="yarn-inline">R</button>
+
             <div class="controls-hint">
-                <button id="format-btn" class="control-btn">Change</button>
+                <button id="format-btn" class="control-btn">Change Mode</button>
             </div>
 
             <div class="video-container">
@@ -114,6 +113,9 @@
                 <canvas class="output_canvas"></canvas>
             </div>
         </section>
+    </div>
+    <div id="intro-screen">
+        <canvas id="intro-bg-canvas"></canvas>
     </div>
     <script src="main.js"></script>
 </body>
