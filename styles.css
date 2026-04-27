@@ -122,21 +122,21 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-/* Description — top:977.74, left:81.06, width:658.1 */
+/* Description — bottom-anchored to match form baseline */
 .imagine-a-book-container {
     position: absolute;
-    top: 87.53vh;
+    bottom: 4vh;
     left: 4.83vw;
     width: 39.17vw;
     line-height: 1.55;
     margin: 0;
 }
 
-/* Form group — top:975.19, left:1104.86, width:542.1, height:74.6 */
+/* Form group — bottom-anchored */
 .rectangle-parent {
     position: absolute;
-    top: 87.31vh;
-    right: 2vw;
+    bottom: 3vh;
+    right: 4.83vw;
     width: 34vw;
     display: flex;
     flex-direction: row;
@@ -145,10 +145,10 @@ body {
 }
 
 .form-glyph {
-    font-size: 3.5vw;
+    font-size: 4vw;
     line-height: 1;
     flex-shrink: 0;
-    margin-bottom: 1.7vh;
+    margin-bottom: 1.2vh;
 }
 
 .form-content {
@@ -158,7 +158,7 @@ body {
 
 /* Label — top:0, left:0 */
 .give-me-a {
-    margin: 0 0 0.37vh 0;
+    margin: 0 0 1.2vh 0;
 }
 
 #login-form {
@@ -220,7 +220,7 @@ body {
 .div {
     position: absolute;
     top: 6.02vh;
-    right: 2vw;
+    right: 4.83vw;
 }
 
 /*LIGHT MODE*/
@@ -257,8 +257,10 @@ body {
     transition: opacity 0.2s ease;
 }
 
-#mode-toggle:hover {
-    opacity: 0.6;
+@media (hover: hover) {
+    #mode-toggle:hover {
+        opacity: 0.6;
+    }
 }
 
 /*CUBE PAGE*/
@@ -499,134 +501,245 @@ body {
     transform: scaleX(-1);
 }
 
+.mobile-yarn-divider {
+    display: none;
+}
+
 /*RESPONSIVE DESIGN*/
 @media (max-width: 1024px) {
-    .cubes-container {
-        flex-direction: column;
-    }
-
     .scene,
     .cube-face {
         width: 300px;
         height: 300px;
     }
 
-    .front {
-        transform: rotateY(0deg) translateZ(150px);
-    }
-
-    .right {
-        transform: rotateY(90deg) translateZ(150px);
-    }
-
-    .back {
-        transform: rotateY(180deg) translateZ(150px);
-    }
-
-    .left {
-        transform: rotateY(-90deg) translateZ(150px);
-    }
-
-    .top {
-        transform: rotateX(90deg) translateZ(150px);
-    }
-
-    .bottom {
-        transform: rotateX(-90deg) translateZ(150px);
-    }
-
-    .title {
-        font-size: 3.5rem;
-    }
+    .front  { transform: rotateY(0deg)    translateZ(150px); }
+    .right  { transform: rotateY(90deg)   translateZ(150px); }
+    .back   { transform: rotateY(180deg)  translateZ(150px); }
+    .left   { transform: rotateY(-90deg)  translateZ(150px); }
+    .top    { transform: rotateX(90deg)   translateZ(150px); }
+    .bottom { transform: rotateX(-90deg)  translateZ(150px); }
 }
 
 @media (max-width: 768px) {
-    #entry-page {
-        padding: 30px;
-        background-size:
-            auto 60px,
-            auto 60px,
-            60px auto,
-            60px auto;
+    /* Entry page — scale up base font so vw-derived sizes read on tablet/phone */
+    .macbook-pro-16-8 {
+        font-size: 2.8vw;
     }
 
-    .title {
-        font-size: 4rem;
-        line-height: 0.9;
+    .form-glyph {
+        font-size: 9vw;
+        margin-bottom: 1vh;
     }
 
-    .subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 2rem;
+    .rectangle-parent {
+        width: 44vw;
+        gap: 2vw;
     }
 
-    /* Cube Sizing for Mobile */
+    .group-child {
+        font-size: 2.8vw;
+        height: 4vh;
+        border-width: 2px;
+    }
+
+    .error {
+        font-size: 2.8vw;
+    }
+
+    /* Hide the middle header label — overlaps on narrow screens */
+    .jorge-luis-borges {
+        display: none;
+    }
+
+    /* Cube */
     .scene,
     .cube-face {
         width: 240px;
         height: 240px;
     }
 
-    .front {
-        transform: rotateY(0deg) translateZ(120px);
-    }
-
-    .right {
-        transform: rotateY(90deg) translateZ(120px);
-    }
-
-    .back {
-        transform: rotateY(180deg) translateZ(120px);
-    }
-
-    .left {
-        transform: rotateY(-90deg) translateZ(120px);
-    }
-
-    .top {
-        transform: rotateX(90deg) translateZ(120px);
-    }
-
-    .bottom {
-        transform: rotateX(-90deg) translateZ(120px);
-    }
-
-    .face-content {
-        padding: 1.5rem;
-    }
+    .front  { transform: rotateY(0deg)    translateZ(120px); }
+    .right  { transform: rotateY(90deg)   translateZ(120px); }
+    .back   { transform: rotateY(180deg)  translateZ(120px); }
+    .left   { transform: rotateY(-90deg)  translateZ(120px); }
+    .top    { transform: rotateX(90deg)   translateZ(120px); }
+    .bottom { transform: rotateX(-90deg)  translateZ(120px); }
 
     .face-content.story-mode {
         padding: 1.5rem;
     }
 
     .face-content.story-mode p {
-        font-size: 1.1rem;
+        font-size: 0.9rem;
     }
 
-    /* Controls & Video */
+    /* Mode toggle */
+    #mode-toggle {
+        font-size: 8vw;
+    }
+
+    /* Hide hand-tracking video — MediaPipe skipped on touch devices */
+    .video-container {
+        display: none;
+    }
+
+    /* Controls */
     .control-btn {
         bottom: 20px;
         padding: 0.6rem 1.5rem;
         font-size: 0.8rem;
-        width: auto;
         white-space: nowrap;
     }
 
-    .video-container {
-        width: 100px;
-        height: 75px;
-        bottom: 10px;
-        right: 10px;
-        border-width: 1px;
-    }
-
-    /* Flow Items */
     .flow-item {
         width: 180px;
         min-height: 120px;
         font-size: 0.85rem;
         padding: 3%;
     }
+}
+
+@media (max-width: 480px) {
+    /* Allow scroll if stacked content overflows */
+    #entry-page {
+        overflow-y: auto;
+    }
+
+    /* Switch from Figma absolute layout to vertical flex */
+    .macbook-pro-16-8 {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        min-height: 100%;
+        padding: 14vw 8vw 10vw;
+        font-size: 3vw;
+        overflow: visible;
+    }
+
+    /* Un-absolute all entry-page children so they flow in the column */
+    .the-book-of-container {
+        position: static;
+        font-size: 18vw;
+        width: 100%;
+        flex: 1 0 auto;
+        display: block;
+        text-align: center;
+        margin: 0;
+        padding: 14vw 0 6vw;
+    }
+
+    .mobile-yarn-divider {
+        display: block;
+        text-align: center;
+        font-size: 40vw;
+        width: 100%;
+        margin-bottom: 35vw;
+    }
+
+    .imagine-a-book-container {
+        position: static;
+        width: 100%;
+        margin-bottom: 6vw;
+    }
+
+    .rectangle-parent {
+        position: static;
+        width: 100%;
+        right: auto;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2vw;
+    }
+
+    .div {
+        display: none;
+    }
+
+    .el-libro-de {
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+    }
+
+    .give-me-a {
+        margin-bottom: 2vh;
+    }
+
+    /* Remove the side glyph on phone — not enough horizontal space */
+    .form-glyph {
+        display: none;
+    }
+
+    /* Touch-friendly input: 16px prevents iOS auto-zoom, 44px meets touch target size */
+    .group-child {
+        font-size: 16px;
+        height: 44px;
+        border-width: 2px;
+    }
+
+    .error {
+        font-size: 3.5vw;
+    }
+
+    /* Cube */
+    .scene,
+    .cube-face {
+        width: 200px;
+        height: 200px;
+    }
+
+    .front  { transform: rotateY(0deg)    translateZ(100px); }
+    .right  { transform: rotateY(90deg)   translateZ(100px); }
+    .back   { transform: rotateY(180deg)  translateZ(100px); }
+    .left   { transform: rotateY(-90deg)  translateZ(100px); }
+    .top    { transform: rotateX(90deg)   translateZ(100px); }
+    .bottom { transform: rotateX(-90deg)  translateZ(100px); }
+
+    .face-content.story-mode p {
+        font-size: 0.8rem;
+    }
+
+    #mode-toggle {
+        font-size: 14vw;
+        top: 3vh;
+        left: 4vw;
+        right: auto;
+    }
+}
+
+/* Phone landscape — content is short, keep cube visible */
+@media (max-height: 500px) and (orientation: landscape) {
+    .the-book-of-container {
+        font-size: 14vw;
+        top: 8vh;
+    }
+
+    .imagine-a-book-container,
+    .el-libro-de,
+    .jorge-luis-borges,
+    .div {
+        display: none;
+    }
+
+    .rectangle-parent {
+        top: 76vh;
+        right: 3vw;
+        width: 38vw;
+    }
+
+    .scene,
+    .cube-face {
+        width: 220px;
+        height: 220px;
+    }
+
+    .front  { transform: rotateY(0deg)    translateZ(110px); }
+    .right  { transform: rotateY(90deg)   translateZ(110px); }
+    .back   { transform: rotateY(180deg)  translateZ(110px); }
+    .left   { transform: rotateY(-90deg)  translateZ(110px); }
+    .top    { transform: rotateX(90deg)   translateZ(110px); }
+    .bottom { transform: rotateX(-90deg)  translateZ(110px); }
 }
 
 /*YARNDINGS ACCENTS*/
@@ -652,47 +765,3 @@ body {
     width: 100%; height: 100%;
 }
 
-@media (max-width: 480px) {
-    .title {
-        font-size: 3rem;
-    }
-
-    .scene,
-    .cube-face {
-        width: 200px;
-        height: 200px;
-    }
-
-    .front {
-        transform: rotateY(0deg) translateZ(100px);
-    }
-
-    .right {
-        transform: rotateY(90deg) translateZ(100px);
-    }
-
-    .back {
-        transform: rotateY(180deg) translateZ(100px);
-    }
-
-    .left {
-        transform: rotateY(-90deg) translateZ(100px);
-    }
-
-    .top {
-        transform: rotateX(90deg) translateZ(100px);
-    }
-
-    .bottom {
-        transform: rotateX(-90deg) translateZ(100px);
-    }
-
-    .input-container {
-        max-width: 280px;
-    }
-
-    .face-content.story-mode p {
-        font-size: 0.9rem;
-       
-    }
-}

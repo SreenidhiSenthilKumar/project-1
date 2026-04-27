@@ -78,10 +78,20 @@ document.addEventListener('DOMContentLoaded', () => {
         camera: null
     };
 
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    if (isTouchDevice) {
+        const vc = document.querySelector('.video-container');
+        if (vc) vc.style.display = 'none';
+    }
+
     /*TITLE PARTICLE EFFECT */
     function initTitleParticleEffect() {
         const title = document.querySelector('.title');
         if (!title) return;
+
+        // No mouse on touch devices — skip the RAF loop, title renders as plain CSS text
+        if (isTouchDevice) return function start() {};
 
         let particles = [];
         let overlayCanvas = null;
@@ -555,8 +565,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const match = obj.fullText.match(/[^.?!]+[.?!]/);
                     obj.el.textContent = match ? match[0] : obj.fullText;
 
-                    const targetX = cx - obj.w / 2;
-                    const targetY = cy - obj.h / 2;
+                    const targetX = cx - obj.el.offsetWidth / 2;
+                    const targetY = cy - obj.el.offsetHeight / 2;
                     obj.el.style.transform = `translate(${targetX}px, ${targetY}px) scale(1.2)`;
                 } else {
                     obj.el.classList.remove('focused');
@@ -607,6 +617,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /*HAND TRACKING (MEDIAPIPE) */
     function initHandTracking() {
+        if (isTouchDevice) return;
+
+        // Scripts are injected dynamically in <head> and load async — wait for them
+        if (typeof Hands === 'undefined' || typeof Camera === 'undefined') {
+            setTimeout(initHandTracking, 100);
+            return;
+        }
+
         const canvasCtx = elements.canvasElement.getContext('2d');
         const hands = new Hands({
             locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
@@ -753,8 +771,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /*GLOBAL LISTENERS */
+    const modeToggleBtn = document.getElementById('mode-toggle');
     window.addEventListener('click', (e) => {
-        if (state.mode.current === 'flow' && e.target !== elements.formatBtn) {
+        if (state.mode.current === 'flow' && e.target !== elements.formatBtn && e.target !== modeToggleBtn) {
             state.flow.manualFocus = !state.flow.manualFocus;
             if (state.flow.manualFocus) {
                 focusClosestElement();

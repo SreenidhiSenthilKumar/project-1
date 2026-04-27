@@ -10,12 +10,20 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Yarndings+12&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script>
+        if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
+            ['camera_utils', 'control_utils', 'drawing_utils'].forEach(lib => {
+                const s = document.createElement('script');
+                s.src = `https://cdn.jsdelivr.net/npm/@mediapipe/${lib}/${lib}.js`;
+                s.crossOrigin = 'anonymous';
+                document.head.appendChild(s);
+            });
+            const hands = document.createElement('script');
+            hands.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js';
+            hands.crossOrigin = 'anonymous';
+            document.head.appendChild(hands);
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -28,6 +36,7 @@
         <section id="entry-page" class="page active">
             <div class="macbook-pro-16-8">
                 <h1 class="the-book-of-container title">The<span class="span"> </span>Book<br>of<span class="span2"> </span>Sand</h1>
+                <span class="mobile-yarn-divider yarn-inline">R</span>
 
                 <p class="imagine-a-book-container">Imagine a book that is a physical labyrinth,<span class="span3"> </span>a volume with no first or last page, where every time you turn a leaf, others sprout infinitely in between.</p>
 
