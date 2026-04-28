@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    /*CONFIGURATION & DATA */
     const CONFIG = {
         bgColors: ['#000000'],
         storyTexts: [
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    /*DOM ELEMENTS */
     const elements = {
         entryPage: document.getElementById('entry-page'),
         cubePage: document.getElementById('cube-page'),
@@ -45,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         canvasElement: document.getElementsByClassName('output_canvas')[0]
     };
 
-    /*STATE MANAGEMENT */
     const state = {
         mode: {
             current: 'default',
@@ -85,12 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (vc) vc.style.display = 'none';
     }
 
-    /*TITLE PARTICLE EFFECT */
     function initTitleParticleEffect() {
         const title = document.querySelector('.title');
         if (!title) return;
 
-        // No mouse on touch devices — skip the RAF loop, title renders as plain CSS text
         if (isTouchDevice) return function start() {};
 
         let particles = [];
@@ -210,7 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    /*INTRO ANIMATION*/
     function initIntroAnimation(onComplete) {
         const screen = document.getElementById('intro-screen');
         if (!screen) { onComplete(); return; }
@@ -277,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(finish, 9200);
     }
 
-    /*NAVIGATION */
     function initNavigation() {
         elements.loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -317,7 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 600);
     }
 
-    /*CUBE INTERACTION */
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -464,7 +456,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /*FLOW MODE */
     function initFlowMode() {
         state.flow.active = true;
         state.flow.paused = false;
@@ -479,7 +470,9 @@ document.addEventListener('DOMContentLoaded', () => {
             el.classList.add('flow-item');
 
             const text = getRandomItem(CONFIG.storyTexts);
-            el.textContent = text;
+            const p = document.createElement('p');
+            p.textContent = text;
+            el.appendChild(p);
             elements.cubesContainer.appendChild(el);
 
             const isMobile = window.innerWidth < 768;
@@ -563,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     obj.el.classList.add('focused');
                     obj.el.classList.remove('hidden');
                     const match = obj.fullText.match(/[^.?!]+[.?!]/);
-                    obj.el.textContent = match ? match[0] : obj.fullText;
+                    obj.el.querySelector('p').textContent = match ? match[0] : obj.fullText;
 
                     const targetX = cx - obj.el.offsetWidth / 2;
                     const targetY = cy - obj.el.offsetHeight / 2;
@@ -582,11 +575,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         state.flow.elements.forEach(obj => {
             obj.el.classList.remove('focused', 'hidden');
-            obj.el.textContent = obj.fullText;
+            obj.el.querySelector('p').textContent = obj.fullText;
         });
     }
 
-    /*MODE SWITCHING */
     function setupModeSwitch() {
         if (!elements.formatBtn) return;
 
@@ -615,11 +607,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /*HAND TRACKING (MEDIAPIPE) */
     function initHandTracking() {
         if (isTouchDevice) return;
 
-        // Scripts are injected dynamically in <head> and load async — wait for them
         if (typeof Hands === 'undefined' || typeof Camera === 'undefined') {
             setTimeout(initHandTracking, 100);
             return;
@@ -770,7 +760,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /*GLOBAL LISTENERS */
     const modeToggleBtn = document.getElementById('mode-toggle');
     window.addEventListener('click', (e) => {
         if (state.mode.current === 'flow' && e.target !== elements.formatBtn && e.target !== modeToggleBtn) {
@@ -783,7 +772,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /*FAVICON*/
     document.fonts.ready.then(() => {
         const canvas = document.createElement('canvas');
         canvas.width = 32;
@@ -802,12 +790,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(link);
     });
 
-    /*MODE TOGGLE*/
     document.getElementById('mode-toggle').addEventListener('click', () => {
         document.documentElement.classList.toggle('light-mode');
     });
 
-    /*INIT */
     const startParticles = initTitleParticleEffect();
     initIntroAnimation(() => startParticles());
     initNavigation();
