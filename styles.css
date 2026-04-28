@@ -675,7 +675,12 @@ body {
     .bottom { transform: rotateX(-90deg)  translateZ(100px); }
 
     .face-content.story-mode p {
-        font-size: 0.8rem;
+        font-size: calc(0.8rem - 1px);
+    }
+
+    .face-content.story-mode p::first-letter,
+    .flow-item p::first-letter {
+        font-size: 2.4em;
     }
 
     #mode-toggle {
